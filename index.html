@@ -1,1 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">  
+<title>S'more Summer Fun Challenge</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    font-family: 'Nunito', sans-serif; 
+    background: linear-gradient(135deg, #dcedc8, #e1bee7); 
+    min-height: 100vh;
+    padding: 12px 12px 80px;
+  }
 
+  .hero { background: #2e7d32; border-radius: 20px; padding: 20px; text-align: center; color: white; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Fredoka One', cursive; font-size: 20px; margin-bottom: 8px; }
+  .hero-subtitle { font-size: 13px; font-weight: 600; line-height: 1.4; color: #e8f5e9; margin-top: 5px; }
+  
+  #name-setup { background: white; border-radius: 18px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  #name-setup input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 10px; }
+  #name-setup button { background: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-family: 'Fredoka One', cursive; cursor: pointer; }
+  
+  #main-app { display: none; }
+  
+  .install-tip {
+    background: #e3f2fd; border-radius: 14px; padding: 12px; margin-bottom: 14px;
+    font-size: 13px; color: #1565c0; font-weight: 700;
+    display: none; /* Hidden by default */
+    align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .install-tip span { font-size: 20px; }
+  .install-tip button { background: none; border: none; font-size: 16px; cursor: pointer; color: #1565c0; margin-left: auto; }
+  
+  .progress-section { background: white; border-radius: 18px; padding: 15px; margin-bottom: 14px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  
+  .progress-circle { width: 70px; height: 70px; flex-shrink: 0; }
+  .progress-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  
+  .progress-info { flex: 1; }
+  .progress-bar-wrap { background: #eee; height: 12px; border-radius: 6px; margin-top: 8px; }
+  .progress-bar-fill { height: 100%; background: #2e7d32; border-radius: 6px; width: 0%; transition: width 0.3s; }
+  
+  .filter-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 5px; }
+  .tab { flex-shrink: 0; padding: 8px 16px; border-radius: 20px; border: none; background: #e0e0e0; font-weight: bold; cursor: pointer; }
+  .tab.active { background: #2e7d32; color: white; }
+  
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid h3 { grid-column: 1 / -1; font-family: 'Fredoka One', cursive; color: #2e7d32; margin: 15px 0 5px 0; }
+  .card { background: white; border-radius: 12px; padding: 10px; border: 2px solid #eee; display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+  .card.done { border-color: #2e7d32; background: #f1f8e9; }
+  .card-title { font-size: 11px; font-weight: 700; }
+  .card-pts { font-size: 10px; color: #2e7d32; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🏕️🔥 S'more Summer Fun Challenge 🏕️🔥</h1>
+  <p class="hero-subtitle">Complete activities to accrue 100 points to earn your patch. Contact your troop leader once you have earned the patch!</p>
+</div>
+
+<div id="name-setup">
+  <h2>💚 Welcome, Girl Scout! 💚</h2>
+  <input type="text" id="name-input" placeholder="Type your name here..." maxlength="30" autocomplete="off">
+  <button onclick="setName()">Let's Start!</button>
+</div>
+
+<div id="main-app">
+  <div class="install-tip" id="install-tip">
+    <span>📱</span>
+    <div>Tap <strong>Share → Add to Home Screen</strong> to save as an app!</div>
+    <button onclick="hideTip()">✕</button>
+  </div>
+
+  <h2 id="scout-name-display" style="text-align: center; margin-bottom: 10px;"></h2>
+  
+  <div class="progress-section">
+    <div class="progress-circle">
+      <svg viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="28" style="stroke: #eee; fill: none; stroke-width: 6;"/>
+        <circle id="prog-circle" cx="36" cy="36" r="28" style="stroke: #2e7d32; fill: none; stroke-width: 6; stroke-dasharray: 176; stroke-dashoffset: 176; transition: stroke-dashoffset 0.5s ease;"/>
+      </svg>
+    </div>
+    <div class="progress-info">
+      <p id="total-pts">Total Points Accrued: 0</p>
+      <p id="points-left" style="font-size: 12px; color: #2e7d32; font-weight: 800;"></p>
+      <div class="progress-bar-wrap"><div id="prog-bar" class="progress-bar-fill"></div></div>
+    </div>
+  </div>
+  
+  <div class="filter-tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+  
+  <div id="bottom-bar" style="display:flex; justify-content: center; margin-top: 20px;">
+    <button onclick="changeName()" style="background:none; border:none; text-decoration:underline; cursor:pointer;">Change Name</button>
+  </div>
+</div>
+
+<script>
+const activities = [
+  // 50 Points
+  { n: 1, emoji: '🏕️', title: 'Attend one session of Summer Camp', pts: 50 },
+  
+  // 20 Points
+  { n: 2, emoji: '🌳', title: 'Earn the Girl Scout Tree Promise Patch', pts: 20 },
+  { n: 3, emoji: '⛺', title: 'Go camping', pts: 20 },
+  { n: 4, emoji: '🧚', title: 'Make a fairy garden', pts: 20 },
+  { n: 5, emoji: '🪁', title: 'Make and fly your own kite', pts: 20 },
+  { n: 6, emoji: '👕', title: 'Tye-dye something', pts: 20 },
+  
+  // 15 Points
+  { n: 7, emoji: '🏖️', title: 'Visit the beach and play in the sand', pts: 15 },
+  { n: 8, emoji: '📦', title: 'Build a backyard box fort', pts: 15 },
+  { n: 9, emoji: '🌈', title: 'Complete a rainbow science experiment', pts: 15 },
+  
+  // 10 Points
+  { n: 10, emoji: '🌊', title: 'Hike to a waterfall', pts: 10 },
+  { n: 11, emoji: '🍎', title: 'Donate something you grew to a food pantry or soup kitchen', pts: 10 },
+  { n: 12, emoji: '📚', title: 'Read an entire book series', pts: 10 },
+  { n: 13, emoji: '⏳', title: 'Make a time capsule', pts: 10 },
+  { n: 14, emoji: '🍳', title: 'Kids make dinner night', pts: 10 },
+  { n: 15, emoji: '♻️', title: 'Pledge to clean up trash then do it', pts: 10 },
+  
+  // 5 Points
+  { n: 16, emoji: '🕳️', title: 'Explore a cave', pts: 5 },
+  { n: 17, emoji: '🥘', title: 'Cook in a foil packet over coals', pts: 5 },
+  { n: 18, emoji: '🦁', title: 'Go to the zoo', pts: 5 },
+  { n: 19, emoji: '🥗', title: 'Make a salad using the colors of the rainbow', pts: 5 },
+  { n: 20, emoji: '🍦', title: 'Make your own ice cream', pts: 5 },
+  { n: 21, emoji: '🛝', title: 'Go on a playground tour', pts: 5 },
+  { n: 22, emoji: '🦋', title: 'Learn how to raise a Monarch butterfly at home', pts: 5 },
+  { n: 23, emoji: '🚲', title: 'Learn about bike safety', pts: 5 },
+  { n: 24, emoji: '🎭', title: 'Put on a puppet show', pts: 5 },
+  { n: 25, emoji: '🌲', title: 'Visit a new-to-you state park', pts: 5 },
+  { n: 26, emoji: '🧊', title: 'Take popsicles to the park to share', pts: 5 },
+  { n: 27, emoji: '⛺', title: 'Sleep in a tent', pts: 5 },
+  { n: 28, emoji: '🏊', title: 'Swim in water that is not a pool', pts: 5 },
+  { n: 29, emoji: '🫐', title: 'Go blueberry picking', pts: 5 },
+  { n: 30, emoji: '🚗', title: 'Wash the car', pts: 5 },
+  { n: 31, emoji: '🍋', title: 'Host a lemonade stand', pts: 5 },
+  { n: 32, emoji: '🗼', title: 'Visit a Lighthouse', pts: 5 },
+  { n: 33, emoji: '🎆', title: 'Watch fireworks', pts: 5 },
+  { n: 34, emoji: '🌿', title: 'Visit an Arboretum', pts: 5 },
+  { n: 35, emoji: '📖', title: 'Make a flip book', pts: 5 },
+  { n: 36, emoji: '🚿', title: 'Build a sun shower out of a bucket', pts: 5 },
+  { n: 37, emoji: '🏆', title: 'Try to break a World Record', pts: 5 },
+  { n: 38, emoji: '🥏', title: 'Visit a Disc Golf Course', pts: 5 },
+  
+  // 2 Points
+  { n: 39, emoji: '📖', title: 'Sign up for Summer Reading at your local library', pts: 2 },
+  { n: 40, emoji: '🚜', title: 'Visit a new-to-you farm', pts: 2 },
+  { n: 41, emoji: '🧸', title: 'Have a Teddy Bear Picnic', pts: 2 },
+  { n: 42, emoji: '🥣', title: 'Invent a new trail-mix recipe', pts: 2 },
+  { n: 43, emoji: '🐚', title: 'Make Seashell Art', pts: 2 },
+  { n: 44, emoji: '🏰', title: 'Build a sandcastle', pts: 2 },
+  { n: 45, emoji: '🏃', title: 'Run 1 mile', pts: 2 },
+  { n: 46, emoji: '🌽', title: 'Visit a farmers\' market', pts: 2 },
+  { n: 47, emoji: '🎸', title: 'Go to an outdoor concert', pts: 2 },
+  { n: 48, emoji: '🌱', title: 'Plant milkweed', pts: 2 },
+  { n: 49, emoji: '📵', title: 'Set a screen free day', pts: 2 },
+  { n: 50, emoji: '📝', title: 'Make a gratitude list', pts: 2 },
+  { n: 51, emoji: '🛼', title: 'Go roller skating', pts: 2 },
+  { n: 52, emoji: '✨', title: 'Observe a summer constellation', pts: 2 },
+  { n: 53, emoji: '👋', title: 'Say hello to a new friend', pts: 2 },
+  { n: 54, emoji: '👣', title: 'Spend a day barefoot', pts: 2 },
+
+  // 1 Point
+  { n: 55, emoji: '⚽', title: 'Attend an outdoor sporting event', pts: 1 },
+  { n: 56, emoji: '💇', title: 'Try a new hairstyle', pts: 1 },
+  { n: 57, emoji: '🌧️', title: 'Play in the rain', pts: 1 },
+  { n: 58, emoji: '🗺️', title: 'Hide a treasure and make a treasure map for a friend', pts: 1 },
+  { n: 59, emoji: '🍵', title: 'Make sun tea', pts: 1 },
+  { n: 60, emoji: '🐦', title: 'Look for a birds nest', pts: 1 },
+  { n: 61, emoji: '🌸', title: 'Do a flower smell test & choose your favorite', pts: 1 },
+  { n: 62, emoji: '🔍', title: 'Look through a magnifying glass', pts: 1 },
+  { n: 63, emoji: '🔧', title: 'Learn how to use a wrench', pts: 1 },
+  { n: 64, emoji: '🤡', title: 'Make a paper bag puppet', pts: 1 },
+  { n: 65, emoji: '🎤', title: 'Sing-along to your favorite song', pts: 1 },
+  { n: 66, emoji: '🐱', title: 'Take a cat nap', pts: 1 },
+  { n: 67, emoji: '🍫', title: 'Make s\'mores', pts: 1 },
+  { n: 68, emoji: '🎲', title: 'Make up and play a new game', pts: 1 },
+  { n: 69, emoji: '☁️', title: 'Hunt for shapes in the clouds', pts: 1 },
+  { n: 70, emoji: '📸', title: 'Photograph wildflowers', pts: 1 },
+  { n: 71, emoji: '👀', title: 'Play I-Spy', pts: 1 },
+  { n: 72, emoji: '🌿', title: 'Visit a rain garden', pts: 1 },
+  { n: 73, emoji: '⭕', title: 'Play with a hula hoop', pts: 1 },
+  { n: 74, emoji: '🎨', title: 'Paint with natural materials', pts: 1 },
+  { n: 75, emoji: '🐾', title: 'Volunteer at an animal shelter', pts: 1 },
+  { n: 76, emoji: '🔥', title: 'Cook something over a fire', pts: 1 },
+  { n: 77, emoji: '🪲', title: 'Go on a bug hunt', pts: 1 },
+  { n: 78, emoji: '🚲', title: 'Ride a bike', pts: 1 },
+  { n: 79, emoji: '🌼', title: 'Make a dandelion crown/necklace', pts: 1 },
+  { n: 80, emoji: '🧘', title: 'Try yoga outside', pts: 1 },
+  { n: 81, emoji: '♻️', title: 'Compost food waste', pts: 1 }
+];
+  
+let done = new Set();
+let currentFilter = 'All';
+
+function getName() { return localStorage.getItem('scout_name') || ''; }
+function nameKey() { return 'scout_name'; }
+function getDone() { 
+    const saved = localStorage.getItem('done_activities');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+}
+
+function checkInstallStatus() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if (isIOS && !isStandalone) {
+    document.getElementById('install-tip').style.display = 'flex';
+  }
+}
+
+function hideTip() {
+  document.getElementById('install-tip').style.display = 'none';
+}
+
+function setName() {
+  const input = document.getElementById('name-input');
+  const val = input.value.trim() || getName();
+  if (!val) return;
+  
+  localStorage.setItem(nameKey(), val);
+  done = getDone();
+  document.getElementById('name-setup').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  document.getElementById('scout-name-display').textContent = val + "'s Summer Challenge";
+  renderTabs();
+  calculatePoints();
+  renderGrid();
+  checkInstallStatus();
+}
+
+function changeName() {
+  const n = prompt('Change name:', getName());
+  if (n && n.trim()) {
+    localStorage.setItem(nameKey(), n.trim());
+    document.getElementById('scout-name-display').textContent = n.trim() + "'s Summer Challenge";
+  }
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('tabs');
+  const categories = ['All', ...new Set(activities.map(a => a.tag))];
+  tabs.innerHTML = '';
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (currentFilter === cat ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { currentFilter = cat; renderTabs(); renderGrid(); };
+    tabs.appendChild(btn);
+  });
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const filtered = currentFilter === 'All' ? activities : activities.filter(a => a.tag === currentFilter);
+  const groups = filtered.reduce((acc, a) => { (acc[a.tag] = acc[a.tag] || []).push(a); return acc; }, {});
+
+  Object.keys(groups).forEach(tag => {
+    const sectionTitle = document.createElement('h3');
+    sectionTitle.textContent = tag;
+    grid.appendChild(sectionTitle);
+    groups[tag].forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'card' + (done.has(a.n) ? ' done' : '');
+      card.onclick = () => toggle(a.n);
+      card.innerHTML = `<div style="font-size: 20px">${a.emoji}</div><div class="card-title">${a.title}</div><div class="card-pts">${a.pts} pts</div>`;
+      grid.appendChild(card);
+    });
+  });
+}
+
+function toggle(n) {
+  if (done.has(n)) done.delete(n); else done.add(n);
+  localStorage.setItem('done_activities', JSON.stringify([...done]));
+  calculatePoints();
+  renderGrid();
+}
+
+function calculatePoints() {
+  let total = 0;
+  done.forEach(n => { const act = activities.find(a => a.n === n); if(act) total += act.pts; });
+  
+  const points = Math.min(total, 100);
+  document.getElementById('total-pts').textContent = 'Total Points Accrued: ' + total;
+  document.getElementById('points-left').textContent = total >= 100 ? 'Goal Reached! 🎉' : (100 - total) + ' pts until your patch!';
+  document.getElementById('prog-bar').style.width = points + '%';
+  
+  const circle = document.getElementById('prog-circle');
+  circle.style.strokeDashoffset = 176 - (points / 100 * 176);
+}
+
+window.onload = () => { if(getName()) setName(); };
+</script>
+</body>
+</html>
